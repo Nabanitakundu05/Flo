@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import { X, ChevronDown, Utensils, Car, ShoppingBag, Film, Pill, Zap, Briefcase, TrendingUp, Package } from 'lucide-react';
 
 export const CATEGORIES = [
-  { value: 'food', label: 'Food & Dining', icon: '🍽', color: '#fb923c', bg: 'rgba(251,146,60,0.15)' },
-  { value: 'transport', label: 'Transport', icon: '🚗', color: '#60a5fa', bg: 'rgba(96,165,250,0.15)' },
-  { value: 'shopping', label: 'Shopping', icon: '🛍', color: '#c084fc', bg: 'rgba(192,132,252,0.15)' },
-  { value: 'entertainment', label: 'Entertainment', icon: '🎬', color: '#f472b6', bg: 'rgba(244,114,182,0.15)' },
-  { value: 'health', label: 'Health', icon: '💊', color: '#34d399', bg: 'rgba(52,211,153,0.15)' },
-  { value: 'utilities', label: 'Utilities', icon: '⚡', color: '#fbbf24', bg: 'rgba(251,191,36,0.15)' },
-  { value: 'salary', label: 'Salary', icon: '💼', color: '#4ade80', bg: 'rgba(74,222,128,0.15)' },
-  { value: 'investment', label: 'Investment', icon: '📈', color: '#38bdf8', bg: 'rgba(56,189,248,0.15)' },
-  { value: 'other', label: 'Other', icon: '📦', color: '#a3a3a3', bg: 'rgba(163,163,163,0.15)' },
+  { value: 'food', label: 'Food & Dining', icon: <Utensils size={16} />, color: '#fb923c', bg: 'rgba(251,146,60,0.15)' },
+  { value: 'transport', label: 'Transport', icon: <Car size={16} />, color: '#60a5fa', bg: 'rgba(96,165,250,0.15)' },
+  { value: 'shopping', label: 'Shopping', icon: <ShoppingBag size={16} />, color: '#c084fc', bg: 'rgba(192,132,252,0.15)' },
+  { value: 'entertainment', label: 'Entertainment', icon: <Film size={16} />, color: '#f472b6', bg: 'rgba(244,114,182,0.15)' },
+  { value: 'health', label: 'Health', icon: <Pill size={16} />, color: '#34d399', bg: 'rgba(52,211,153,0.15)' },
+  { value: 'utilities', label: 'Utilities', icon: <Zap size={16} />, color: '#fbbf24', bg: 'rgba(251,191,36,0.15)' },
+  { value: 'salary', label: 'Salary', icon: <Briefcase size={16} />, color: '#4ade80', bg: 'rgba(74,222,128,0.15)' },
+  { value: 'investment', label: 'Investment', icon: <TrendingUp size={16} />, color: '#38bdf8', bg: 'rgba(56,189,248,0.15)' },
+  { value: 'other', label: 'Other', icon: <Package size={16} />, color: '#a3a3a3', bg: 'rgba(163,163,163,0.15)' },
 ];
 
 const EMPTY = {
@@ -37,6 +37,64 @@ function FloatInput({ id, label, type = 'text', value, onChange, min, step, requ
         autoComplete="off"
       />
       <label htmlFor={id}>{label}</label>
+    </div>
+  );
+}
+
+function CustomCategorySelect({ value, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedCat = CATEGORIES.find((c) => c.value === value) || CATEGORIES[0];
+
+  return (
+    <div className="float-label-group has-value relative" ref={ref}>
+      <div 
+        className="w-full bg-bg-elevated border border-border-subtle rounded-lg px-4 pt-6 pb-2 text-warm-100 font-dm-sans text-sm outline-none transition-colors duration-200 focus-within:border-accent-indigo cursor-pointer flex items-center justify-between"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="flex items-center gap-2">
+          <span style={{ color: selectedCat.color }} className="flex items-center justify-center">{selectedCat.icon}</span>
+          <span>{selectedCat.label}</span>
+        </div>
+        <ChevronDown size={16} className={`text-warm-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </div>
+      <label className="absolute left-4 top-4 text-xs text-warm-400 scale-90 origin-left pointer-events-none">
+        Category
+      </label>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-bg-elevated border border-border-subtle rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-1">
+          {CATEGORIES.map((c) => (
+            <div
+              key={c.value}
+              className={`px-4 py-2.5 flex items-center gap-3 cursor-pointer hover:bg-bg-hover transition-colors ${value === c.value ? 'bg-bg-hover' : ''}`}
+              onClick={() => {
+                onChange(c.value);
+                setIsOpen(false);
+              }}
+            >
+              <div 
+                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: c.bg, color: c.color }}
+              >
+                {c.icon}
+              </div>
+              <span className="text-sm font-dm-sans text-warm-100">{c.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -162,21 +220,10 @@ export function TransactionModal({ isOpen, onClose, onSave, editingTx }) {
           </div>
 
           {/* Category */}
-          <div className={`float-label-group has-value`}>
-            <select
-              id="tx-category"
-              value={form.category}
-              onChange={set('category')}
-              className="custom-select"
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c.value} value={c.value} style={{ background: '#16161c' }}>
-                  {c.icon} {c.label}
-                </option>
-              ))}
-            </select>
-            <label htmlFor="tx-category">Category</label>
-          </div>
+          <CustomCategorySelect 
+            value={form.category} 
+            onChange={(val) => setForm(p => ({ ...p, category: val }))} 
+          />
 
           {/* Date */}
           <div className="float-label-group has-value">
@@ -187,7 +234,7 @@ export function TransactionModal({ isOpen, onClose, onSave, editingTx }) {
               onChange={set('date')}
               className="w-full bg-bg-elevated border border-border-subtle rounded-lg px-4 pt-6 pb-2 text-warm-100 font-dm-sans text-sm outline-none transition-colors duration-200 focus:border-accent-indigo"
             />
-            <label htmlFor="tx-date" className="absolute left-4 top-4 text-xs text-warm-400 scale-90 origin-left">
+            <label htmlFor="tx-date" className="absolute left-4 top-4 text-xs text-warm-400 scale-90 origin-left pointer-events-none">
               Date
             </label>
           </div>
