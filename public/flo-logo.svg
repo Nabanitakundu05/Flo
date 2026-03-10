@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Light teal base (bottom fish) -->
+  <circle cx="100" cy="100" r="98" fill="#1e7a68"/>
+
+  <!-- Dark teal half (top fish) — classic yin-yang path -->
+  <path d="
+    M 100 2
+    A 48 48 0 0 1 100 98
+    A 48 48 0 0 0 100 194
+    A 96 96 0 0 1 100 2
+    Z
+  " fill="#1d4644"/>
+
+  <!-- Eye in dark section → light teal -->
+  <circle cx="100" cy="52" r="13" fill="#1e7a68"/>
+  <circle cx="100" cy="52" r="6"  fill="white"/>
+
+  <!-- Eye in light section → dark teal -->
+  <circle cx="100" cy="148" r="13" fill="#1d4644"/>
+  <circle cx="100" cy="148" r="6"  fill="white"/>
+</svg>
